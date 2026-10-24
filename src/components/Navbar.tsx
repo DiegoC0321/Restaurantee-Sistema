@@ -41,19 +41,17 @@ export default function Navbar() {
   const { usuario, logout } = useAuth();
   const pathname = usePathname();
   const bloqueado = useFlujoBloqueado();
-  // En la zona del cliente, una cuenta de personal (mesero/cocina/admin) NO es
-  // la identidad del comensal: pertenece a otro proceso. Se muestra la vista de
-  // invitado. Solo una cuenta CLIENTE registrada se muestra como sesión aquí.
+
   const enCliente = (pathname ?? '').startsWith('/cliente');
+
   const vistaCliente = enCliente && usuario?.rol !== 'CLIENTE';
+
   const enlaces = vistaCliente
     ? ENLACES_POR_ROL.INVITADO
     : usuario
       ? ENLACES_POR_ROL[usuario.rol] ?? []
       : [];
 
-  // Tras un pedido, el cliente queda en la confirmación: no se ofrece ninguna
-  // navegación ni acceso a login.
   if (bloqueado) {
     return (
       <nav className="navbar navbar-dark rv-navbar sticky-top">
@@ -70,10 +68,12 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark rv-navbar sticky-top">
       <div className="container">
+
         <Link className="navbar-brand" href="/">
           Trattoria <em>del Vicolo</em>
           <small>Cucina italiana · dal 1987</small>
         </Link>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -83,8 +83,11 @@ export default function Navbar() {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
+
         <div className="collapse navbar-collapse" id="navbarContent">
+
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+
             {!usuario && (
               <li className="nav-item">
                 <Link className="nav-link" href="/menu">
@@ -92,6 +95,7 @@ export default function Navbar() {
                 </Link>
               </li>
             )}
+
             {enlaces.map((enlace) => (
               <li className="nav-item" key={enlace.href}>
                 <Link className="nav-link" href={enlace.href}>
@@ -99,8 +103,11 @@ export default function Navbar() {
                 </Link>
               </li>
             ))}
+
           </ul>
+
           <ul className="navbar-nav ms-auto align-items-lg-center">
+
             {usuario ? (
               <>
                 <li className="nav-item me-2 mb-2 mb-lg-0">
@@ -110,21 +117,44 @@ export default function Navbar() {
                       : `${usuario.nombre} · ${usuario.rol}`}
                   </span>
                 </li>
+
                 {usuario.rol !== 'INVITADO' && !vistaCliente && (
                   <li className="nav-item mb-2 mb-lg-0">
-                    <button className="rv-nav-salir" onClick={() => logout()}>
+                    <button
+                      className="rv-nav-salir"
+                      onClick={() => logout()}
+                    >
                       Cerrar sesión
                     </button>
                   </li>
                 )}
               </>
             ) : (
-              <li className="nav-item">
-                <Link className="nav-link rv-nav-cta" href="/menu?mesa=1">
-                  <i className="bi bi-qr-code-scan"></i> Pedir desde la mesa
-                </Link>
-              </li>
+              <>
+                {/* BOTÓN PARA INICIAR SESIÓN */}
+                <li className="nav-item me-2 mb-2 mb-lg-0">
+                  <Link
+                    className="nav-link"
+                    href="/acceso/operador"
+                  >
+                    <i className="bi bi-box-arrow-in-right"></i>{' '}
+                    Iniciar sesión
+                  </Link>
+                </li>
+
+                {/* BOTÓN PARA PEDIR DESDE LA MESA */}
+                <li className="nav-item">
+                  <Link
+                    className="nav-link rv-nav-cta"
+                    href="/menu?mesa=1"
+                  >
+                    <i className="bi bi-qr-code-scan"></i>{' '}
+                    Pedir desde la mesa
+                  </Link>
+                </li>
+              </>
             )}
+
           </ul>
         </div>
       </div>
